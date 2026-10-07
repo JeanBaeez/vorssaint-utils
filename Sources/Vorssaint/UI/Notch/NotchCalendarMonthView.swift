@@ -43,7 +43,7 @@ struct NotchCalendarMonthView: View {
                 }
                 ForEach(NotchCalendarSupport.monthDays(containing: month), id: \.self) { date in
                     if weekNumbers, NotchCalendarSupport.startsWeek(date) {
-                        NotchCalendarWeekNumber(date: date, digit: 24, spacing: 2, height: 30)
+                        NotchCalendarWeekNumber(date: date, text: text, digit: 24, spacing: 2, height: 30)
                     }
                     dayButton(date)
                 }
@@ -249,7 +249,7 @@ struct NotchCalendarMonthGrid: View {
                 }
                 ForEach(NotchCalendarSupport.monthDays(containing: month), id: \.self) { date in
                     if weekNumbers, NotchCalendarSupport.startsWeek(date) {
-                        NotchCalendarWeekNumber(date: date, digit: circle, spacing: 0, height: rowHeight)
+                        NotchCalendarWeekNumber(date: date, text: text, digit: circle, spacing: 0, height: rowHeight)
                     }
                     dayButton(date)
                 }
@@ -305,12 +305,12 @@ struct NotchCalendarMonthGrid: View {
 
 /// The number of the week a row of the month grid holds, in a narrow column
 /// ahead of its days. It is laid out like a day, above the room a day keeps
-/// for its event dots, so both sit on one line. Each day already reads out
-/// its full date, so the number stays out of the accessibility tree like the
-/// weekday letters above it.
+/// for its event dots, so both sit on one line. No day's label names its
+/// week, so VoiceOver reads the number as a week ahead of the row's days.
 struct NotchCalendarWeekNumber: View {
     static let width: CGFloat = 18
     let date: Date
+    let text: NotchCalendarStrings
     let digit: CGFloat
     let spacing: CGFloat
     let height: CGFloat
@@ -324,11 +324,11 @@ struct NotchCalendarWeekNumber: View {
         VStack(spacing: spacing) {
             Text(NotchCalendarSupport.weekNumber(of: date), format: .number)
                 .font(.system(size: 9, weight: .medium).monospacedDigit())
-                .foregroundStyle(.white.opacity(0.3))
+                .foregroundStyle(.white.opacity(0.45))
                 .frame(height: digit)
+                .accessibilityLabel(NotchCalendarSupport.weekNumberLabel(of: date, text: text))
             Color.clear.frame(height: 3)
         }
         .frame(width: Self.width, height: height)
-        .accessibilityHidden(true)
     }
 }

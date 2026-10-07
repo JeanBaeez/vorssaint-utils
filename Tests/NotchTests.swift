@@ -2694,6 +2694,23 @@ enum NotchTests {
                && NotchCalendarSupport.weekNumber(of: date(2027, 1, 1), calendar: calendar) == 1
                && NotchCalendarSupport.weekNumber(of: date(2026, 12, 27), calendar: calendar) == 1,
                "a Sunday-first calendar starts week 1 with the row that holds January 1")
+        for language in AppLanguage.allCases {
+            let text = FeatureStrings.notchCalendar(language)
+            let label = NotchCalendarSupport.weekNumberLabel(of: date(2026, 12, 26), text: text, calendar: calendar)
+            let words = label.replacingOccurrences(of: "52", with: "")
+                .trimmingCharacters(in: CharacterSet.whitespaces.union(.punctuationCharacters))
+            suite.expect(TestFormat.parse(text.weekNumber)?.conversions == ["d"]
+                   && text.weekNumber.components(separatedBy: "%d").count == 2
+                   && label.contains("52") && !words.isEmpty,
+                   "VoiceOver reads a row's week number as that week in \(language.rawValue)")
+        }
+        let monthView = (try? String(contentsOfFile: "Sources/Vorssaint/UI/Notch/NotchCalendarMonthView.swift",
+                                     encoding: .utf8)) ?? ""
+        let weekNumberView = monthView.components(separatedBy: "struct NotchCalendarWeekNumber: View {").last ?? ""
+        suite.expect(monthView.components(separatedBy: "NotchCalendarWeekNumber(date: date, text: text,").count == 3
+               && weekNumberView.contains(".accessibilityLabel(NotchCalendarSupport.weekNumberLabel(of: date, text: text))")
+               && !weekNumberView.contains(".accessibilityHidden(true)"),
+               "both month grids give VoiceOver each row's week number")
         let march = NotchCalendarSupport.monthDays(containing: date(2026, 3, 15), calendar: calendar)
         suite.expect(march.contains(date(2026, 3, 8)) && march.contains(date(2026, 3, 9))
                && date(2026, 3, 9).timeIntervalSince(date(2026, 3, 8)) == 23 * 3600,

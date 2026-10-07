@@ -134,6 +134,11 @@ enum NotchCalendarSupport {
         calendar.component(.weekOfYear, from: date)
     }
 
+    /// What VoiceOver reads for that number, since no day's label names its week.
+    static func weekNumberLabel(of date: Date, text: NotchCalendarStrings, calendar: Calendar = .current) -> String {
+        String(format: text.weekNumber, weekNumber(of: date, calendar: calendar))
+    }
+
     static func startsWeek(_ date: Date, calendar: Calendar = .current) -> Bool {
         calendar.component(.weekday, from: date) == calendar.firstWeekday
     }
