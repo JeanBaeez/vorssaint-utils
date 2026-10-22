@@ -1095,6 +1095,13 @@ enum CommandBarFeatureTests {
                          "\(input) shows \(expected), not \(units(input) ?? "nil")")
         }
         suite.expect(unitNumbers(units("0 mm to km")) == ["0"], "zero still reads as plain 0")
+        for input in ["32 f to c", "-459.67 f to k", "273.15 k to c"] {
+            let numbers = unitNumbers(units(input))
+            suite.expect(numbers.count == 1 && numbers.first.flatMap(Double.init) == 0,
+                         "\(input) rounds temperature offset noise back to zero, found \(units(input) ?? "nil")")
+        }
+        suite.expect(unitNumbers(units("0.0001 c to c")) == ["0.0001"],
+                     "small temperatures retain their existing four-decimal precision")
 
         // MARK: Command bar emoji
 

@@ -234,8 +234,10 @@ enum CommandBarUnits {
         formatter.numberFormatter.minimumFractionDigits = 0
         // Four decimals would print a millionth as "0", which reads as a
         // wrong answer, so a tiny value keeps its significant digits instead.
+        // Temperature offsets can leave a tiny rounding remainder at zero;
+        // keep their existing decimal precision instead of exposing it.
         let magnitude = abs(measurement.value)
-        if magnitude != 0, magnitude < 0.001 {
+        if magnitude != 0, magnitude < 0.001, !(measurement.unit is UnitTemperature) {
             formatter.numberFormatter.usesSignificantDigits = true
             formatter.numberFormatter.maximumSignificantDigits = 4
         }
